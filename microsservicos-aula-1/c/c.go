@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"io/ioutil"
+	"github.com/hashicorp/go-retryablehttp"
+	"net/url"
 )
 
 type Coupon struct {
@@ -18,7 +21,8 @@ type Coupons struct {
 func (c Coupons) Check(code string) string {
 	for _, item := range c.Coupon {
 		if code == item.Code {
-			return "valid"
+			resultCheck := makeHttpCall("http://localhost:9093", code)
+			return resultCheck.Status
 		}
 	}
 	return "invalid"
@@ -53,5 +57,34 @@ func home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, string(jsonResult))
+
+}
+
+func makeHttpCall(urlMicroservice string, coupon string) Result {
+
+	values := url.Values{}
+	values.Add("coupon", coupon)
+
+	retryClient := retryablehttp.NewClient()
+	retryClient.RetryMax = 5
+
+	res, err := retryClient.PostForm(urlMicroservice, values)
+	if err != nil {
+		result := Result{Status: "Servidor fora do ar!"}
+		return result
+	}
+
+	defer res.Body.Close()
+
+	data, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal("Error processing result")
+	}
+
+	result := Result{}
+
+	json.Unmarshal(data, &result)
+
+	return result
 
 }

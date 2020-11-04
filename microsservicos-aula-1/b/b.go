@@ -26,7 +26,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 	result := Result{Status: "declined"}
 
-	if ccNumber == "1" {
+	if ccNumber == "1" && resultCoupon.Status == "valid" {
 		result.Status = "approved"
 	}
 
