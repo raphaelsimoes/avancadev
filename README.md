@@ -3,4 +3,4 @@
 
 ![Screenshot](processado.png)
 
-![Screenshot](cupom_ invalido.png)
+![Screenshot](cupom_invalido.png)
