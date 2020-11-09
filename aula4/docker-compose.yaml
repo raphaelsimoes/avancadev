@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+
+  rabbit:
+    image: "rabbitmq:3-management"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWOOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  microservico_a:
+    image: "rsimoesfaria/microservico_a"
+    ports: 
+      - "9090:9090"
+  
+  microservico_b:
+    image: "rsimoesfaria/microservico_b"
+    depends_on:
+      - "rabbit"
+  
+  microservico_c:
+    image: "rsimoesfaria/microservico_c"
+    ports: 
+      - "9092:9092"
